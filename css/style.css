@@ -25,3 +25,25 @@ body {
     font-size: 36px;
     cursor: pointer;
 }
+
+.cell.used {
+ pointer-events: none; /* disable element from being a target */
+}
+
+.black::after {
+    content: "";
+    height: 38px;
+    width: 38px;
+    background-image: radial-gradient(#000, #333, #888);
+    border: 3px solid #ddd;
+    border-radius: 50%;
+}
+
+.white::after {
+    content: "";
+    height: 38px;
+    width: 38px;
+    background-image: radial-gradient(#fff, #aaa, #777);
+    border: 3px solid #333;
+    border-radius: 50%;
+}
