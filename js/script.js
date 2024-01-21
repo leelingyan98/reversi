@@ -28,12 +28,17 @@ function drawLayout() {
     // Loop through each row to access layout values
     for (let row = 0; row < gameBoardLayout.length; row++) {
         const rowValue = gameBoardLayout[row];
-        console.log(rowValue);
-
         //Loop through each column to access layout values
         for (let column = 0; column < rowValue.length; column++) {
-            const colValue = rowValue[column];
-            console.log(colValue);
+            const colValue = rowValue[column]; // Get layout array value
+            const cellIndex = row * gameBoardLayout.length + column; // Generate index number of each cell i.e. row 0 * 8 cells + column 0
+            console.log(`Cell Index: ${cellIndex}`); // Check if cellIndex works
+            const cell = cells[cellIndex]; // Access the cells array with index
+            if (colValue === 1) {
+                cell.classList.add('white');
+            } else if (colValue === 2) {
+                cell.classList.add('black');
+            }
         }
     }
 
