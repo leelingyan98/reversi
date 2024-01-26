@@ -23,16 +23,28 @@ let gameBoardLayout = [
     [0, 0, 0, 0, 0, 0, 0, 0]
 ];
 
+// Assign gameBoardLayout position to each cell
+function assignLayoutPos() {
+    // Loop through each row to access layout values
+    for (let row = 0; row < gameBoardLayout.length; row++) {
+        //Loop through each column to access layout values
+        for (let column = 0; column < gameBoardLayout[row].length; column++) {
+            const cellIndex = row * gameBoardLayout.length + column; // Generate index number of each cell i.e. row 0 * 8 cells + column 0
+            const cell = cells[cellIndex]; // Access the cells array with index
+            cell.dataset.row = row; // define row
+            cell.dataset.col = column; // define column
+        }
+    }
+}
+
 // Render the current game layout to game board
 function drawLayout() {
     // Loop through each row to access layout values
     for (let row = 0; row < gameBoardLayout.length; row++) {
-        const rowValue = gameBoardLayout[row];
         //Loop through each column to access layout values
-        for (let column = 0; column < rowValue.length; column++) {
-            const colValue = rowValue[column]; // Get layout array value
+        for (let column = 0; column < gameBoardLayout[row].length; column++) {
+            const colValue =  gameBoardLayout[row][column]; // Get layout array value
             const cellIndex = row * gameBoardLayout.length + column; // Generate index number of each cell i.e. row 0 * 8 cells + column 0
-            console.log(`Cell Index: ${cellIndex}`); // Check if cellIndex works
             const cell = cells[cellIndex]; // Access the cells array with index
             if (colValue === 1) {
                 cell.classList.add('white');
@@ -41,6 +53,8 @@ function drawLayout() {
             }
         }
     }
+
+    console.log(gameBoardLayout);
 
     // Switch the player
     if (currentPlayer == 1) {
@@ -73,9 +87,28 @@ function handleCellClick(event) {
             cell.classList.add('black');
         }
         cell.classList.add('used'); // adding a class to prevent players to change cell values after it is set
+        const cellRow = parseInt(cell.dataset.row); // ensure row value is a number
+        const cellCol = parseInt(cell.dataset.col); // ensure col value is a number
+        console.log(`${cellRow} ${cellCol}`) // check cell row and cell column value
         drawLayout();
         countPlayerCells();
+        checkIfClickable(cellRow, cellCol);
      }
+}
+
+function checkIfClickable(row, col) {
+    // check top right bottom left values
+    const topVal = gameBoardLayout[row-1][col];
+    const rightVal = gameBoardLayout[row][col+1];
+    const btmVal = gameBoardLayout[row][col];
+    const leftVal = gameBoardLayout[row][col-1];
+    console.log(`top right bottom left ${topVal} ${rightVal} ${btmVal} ${leftVal}`);
+    // check diagonals values
+    const topLeftVal = gameBoardLayout[row-1][col-1];
+    const topRightVal = gameBoardLayout[row-1][col+1];
+    const btmRightVal = gameBoardLayout[row+1][col+1];
+    const btmLeftVal = gameBoardLayout[row+1][col-1];
+    console.log(`TL TR BR BL ${topLeftVal} ${topRightVal} ${btmRightVal} ${btmLeftVal}`);
 }
 
 // Restart the game
@@ -111,6 +144,7 @@ function restartGame() {
 }
 
 // Initialize the game
+assignLayoutPos();
 gameBoard.addEventListener('click', handleCellClick); // run handleCellClick everytime gameBoard is clicked
 restartButton.addEventListener('click', restartGame); // run restartGame when Restart button is clicked
 restartGame();
