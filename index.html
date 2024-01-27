@@ -9,6 +9,20 @@
 </head>
 <body>
     <main>
+        <div class="text">
+            <h1>Reversi Game</h1>
+            <div id="gameUI">
+                <div id="tileCounter">
+                    <div class="blackTile"></div>
+                    <p>Black: <br><span id="blackCounter"></span></p>
+                    <div class="whiteTile"></div>
+                    <p>White: <br><span id="whiteCounter"></span></p>
+                </div>
+                <h2 id="statusText"></h2>
+                <button id="restartButton">Restart Game</button>
+            </div>
+        </div>
+
         <div id="gameBoard" class="game-board">
             <!-- Row 1 -->
             <div class="cell"></div>
@@ -84,13 +98,6 @@
             <div class="cell"></div>
         </div>
     </main>
-    <aside>
-        <h1>Reversi Game</h1>
-        <p>Black: <span id="blackCounter"></span></p>
-        <p>White: <span id="whiteCounter"></span></p>
-        <h2 id="statusText"></h2>
-        <button id="restartButton">Restart Game</button>
-    </aside>
     <script src="./js/script.js"></script>
 </body>
 </html>
