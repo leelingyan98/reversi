@@ -56,7 +56,11 @@ body {
 }
 
 .cell.default, .cell.used {
- pointer-events: none; /* disable element from being a target */
+    pointer-events: none; /* disable element from being a target */
+}
+
+.clickableSpot {
+    background-image: radial-gradient(rgba(255, 255, 255, 0) 35%, rgba(255, 255, 255, 0.5));
 }
 
 .black::after {

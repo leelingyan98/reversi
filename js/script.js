@@ -5,8 +5,8 @@ const statusText = document.getElementById('statusText');
 const restartButton = document.getElementById('restartButton');
 
 // Game Logic
-let clickable = false; // default clickable to boolean 'false'
 let affectedTiles = []; // array of affected tiles
+let gameOver = false;
 
 // Game Player (to change into Object later?)
 const blackPlayer = 2; // Assign numerical value "2" to player Black
@@ -14,8 +14,6 @@ let blackPlayerCount = document.getElementById('blackCounter');
 const whitePlayer = 1; // Assign numerical value "1" to player Black
 let whitePlayerCount = document.getElementById('whiteCounter');
 let currentPlayer = 2; // Start with Black player
-
-console.log(cells);
 
 // Define game board layout with array
 let gameBoardLayout = [
@@ -43,6 +41,29 @@ function assignLayoutPos() {
     }
 }
 
+// check if player can make any moves by iterating over every cell with checkIfClickable function
+function checkMoves(player) {
+    for (let row = 0; row < gameBoardLayout.length; row++) {
+        for (let col = 0; col < gameBoardLayout[row].length; col++) {
+            affectedTiles = []; // reset affectedTiles for next iteration
+            const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            let findAffectedTiles = checkIfClickable(row, col);
+            if (findAffectedTiles.length > 0 && !cell.classList.contains('used')) {
+                cell.classList.add('clickableSpot');
+                findAffectedTiles = []; // reset findAffectedTiles for next iteration
+            } else if (!findAffectedTiles) {
+                if (player === 2) {
+                    currentPlayer = 1;
+                } else if (player === 1) {
+                    currentPlayer = 2;
+                } else {
+                    gameOver = true;
+                }
+            }
+        } 
+    }
+}
+
 // Render the current game layout to game board
 function drawLayout() {
     // Loop through each row to access layout values
@@ -54,10 +75,13 @@ function drawLayout() {
             const cell = cells[cellIndex]; // Access the cells array with index
             cell.classList.remove('white');
             cell.classList.remove('black');
+            cell.classList.remove('clickableSpot');
             if (colValue === 1) {
                 cell.classList.add('white');
+                cell.classList.add('used');
             } else if (colValue === 2) {
                 cell.classList.add('black');
+                cell.classList.add('used');
             }
             cell.dataset.value = gameBoardLayout[row][col];
         }
@@ -81,17 +105,15 @@ function handleCellClick(event) {
 
     const cellRow = parseInt(cell.dataset.row); // set and ensure row value is a number
     const cellCol = parseInt(cell.dataset.col); // set and ensure col value is a number
-    const cellVal = gameBoardLayout[cellRow][cellCol]; // access current gameboard tile value
-    console.log(`Row ${cellRow} Col ${cellCol} Tile ${cellVal}`) // check current cell row, column and value
 
     // if cell already contains black or white, do not run functions
     if (cell.classList.contains('black') || cell.classList.contains('white')) {
         return;
     } else if (isCell) {
         checkIfClickable(cellRow, cellCol);
-        if (!clickable) {
+        if (!cell.classList.contains('clickableSpot')) {
             return;
-        } else if (clickable && isCell) {
+        } else if (cell.classList.contains('clickableSpot') && isCell) {
             if (currentPlayer === 1) {
                 cell.classList.add('white'); // add white tile to cell
                 gameBoardLayout[cellRow][cellCol] = 1; // change gameBoardLayout value to 1
@@ -99,12 +121,15 @@ function handleCellClick(event) {
                 cell.classList.add('black'); // add black tile to cell
                 gameBoardLayout[cellRow][cellCol] = 2; // change gameBoardLayout value to 2
             }
-            console.log('Affected tiles:');
-            console.log(affectedTiles);
+
             flipTiles(affectedTiles);
+
             cell.classList.add('used'); // adding a class to prevent players to change cell values after it is set
+
             drawLayout();
+
             countPlayerCells();
+
             // Switch the player
             if (currentPlayer == 1) {
                 currentPlayer = 2;
@@ -114,8 +139,8 @@ function handleCellClick(event) {
                 statusText.innerText = "White's Turn";
             }
 
-            clickable = false; // reset clickable variable to false
             affectedTiles = []; // reset array of affected tiles
+            checkMoves(currentPlayer);
         }
     }
 }
@@ -132,9 +157,7 @@ function checkIfClickable(row, col) {
     /////////////////////////////////
 
     // check towards the left
-
-    // push values into an array to check if last value is equal to player tile
-    const leftArr = [];
+    const leftArr = []; // push values into an array to check if last value is equal to player tile
     while (colIndex > 0) {
         colIndex -= 1;
         const val = gameBoardLayout[rowIndex][colIndex];
@@ -145,11 +168,9 @@ function checkIfClickable(row, col) {
 
     // if valid move, cell is clickable
     if (isValidMove) {
-        clickable = true;
         rowIndex = row;
         colIndex = col;
         tilesToFlip = isValidMove.length;
-        console.log(`${rowIndex} ${colIndex}`);
         while (colIndex > 0 && tilesToFlip > 0) {
             colIndex -= 1;
             tilesToFlip -= 1;
@@ -158,11 +179,8 @@ function checkIfClickable(row, col) {
         }
     }
 
-
     // check towards the right
-
-    // push values into an array to check if last value is equal to player tile
-    const rightArr = [];
+    const rightArr = []; // push values into an array to check if last value is equal to player tile
     rowIndex = row;
     colIndex = col;
     while (colIndex < 7) {
@@ -175,11 +193,9 @@ function checkIfClickable(row, col) {
 
     // if valid move, cell is clickable
     if (isValidMove) {
-        clickable = true;
         colIndex = col;
         rowIndex = row;
         tilesToFlip = isValidMove.length;
-        console.log(`${rowIndex} ${colIndex}`);
         while (colIndex < 7 && tilesToFlip > 0) {
             colIndex += 1;
             tilesToFlip -= 1;
@@ -189,9 +205,7 @@ function checkIfClickable(row, col) {
     }
 
     // check towards the top
-
-    // push values into an array to check if last value is equal to player tile
-    const topArr = [];
+    const topArr = []; // push values into an array to check if last value is equal to player tile
     rowIndex = row;
     colIndex = col;
     while (rowIndex > 0) {
@@ -204,11 +218,9 @@ function checkIfClickable(row, col) {
 
     // if valid move, cell is clickable
     if (isValidMove) {
-        clickable = true;
         colIndex = col;
         rowIndex = row;
         tilesToFlip = isValidMove.length;
-        console.log(`${rowIndex} ${colIndex}`);
         while (rowIndex > 0 && tilesToFlip > 0) {
             rowIndex -= 1;
             tilesToFlip -= 1;
@@ -218,9 +230,7 @@ function checkIfClickable(row, col) {
     }
 
     // check towards the bottom
-
-    // push values into an array to check if last value is equal to player tile
-    const btmArr = [];
+    const btmArr = []; // push values into an array to check if last value is equal to player tile
     rowIndex = row;
     colIndex = col;
     while (rowIndex < 7) {
@@ -233,11 +243,9 @@ function checkIfClickable(row, col) {
 
     // if valid move, cell is clickable
     if (isValidMove) {
-        clickable = true;
         colIndex = col;
         rowIndex = row;
         tilesToFlip = isValidMove.length;
-        console.log(`${rowIndex} ${colIndex}`);
         while (rowIndex < 7 && tilesToFlip > 0) {
             rowIndex += 1;
             tilesToFlip -= 1;
@@ -251,8 +259,7 @@ function checkIfClickable(row, col) {
     /////////////////////////////////
 
     // check towards the top left
-    // push values into an array to check if last value is equal to player tile
-    const topLeftArr = [];
+    const topLeftArr = []; // push values into an array to check if last value is equal to player tile
     rowIndex = row;
     colIndex = col;
     while (rowIndex > 0 && colIndex > 0) {
@@ -266,11 +273,9 @@ function checkIfClickable(row, col) {
 
     // if valid move, cell is clickable
     if (isValidMove) {
-        clickable = true;
         rowIndex = row;
         colIndex = col;
         tilesToFlip = isValidMove.length;
-        console.log(`${rowIndex} ${colIndex}`);
         while (rowIndex > 0 && colIndex > 0 && tilesToFlip > 0) {
             rowIndex -= 1;
             colIndex -= 1;
@@ -281,8 +286,7 @@ function checkIfClickable(row, col) {
     }
 
     // check towards the top right
-    // push values into an array to check if last value is equal to player tile
-    const topRightArr = [];
+    const topRightArr = []; // push values into an array to check if last value is equal to player tile
     rowIndex = row;
     colIndex = col;
     while (rowIndex > 0 && colIndex < 7) {
@@ -296,11 +300,9 @@ function checkIfClickable(row, col) {
 
     // if valid move, cell is clickable
     if (isValidMove) {
-        clickable = true;
         rowIndex = row;
         colIndex = col;
         tilesToFlip = isValidMove.length;
-        console.log(`${rowIndex} ${colIndex}`);
         while (rowIndex > 0 && colIndex < 7 && tilesToFlip > 0) {
             rowIndex -= 1;
             colIndex += 1;
@@ -311,8 +313,7 @@ function checkIfClickable(row, col) {
     }
 
     // check towards the bottom left
-    // push values into an array to check if last value is equal to player tile
-    const btmLeftArr = [];
+    const btmLeftArr = []; // push values into an array to check if last value is equal to player tile
     rowIndex = row;
     colIndex = col;
     while (rowIndex < 7 && colIndex > 0) {
@@ -326,11 +327,9 @@ function checkIfClickable(row, col) {
 
     // if valid move, cell is clickable
     if (isValidMove) {
-        clickable = true;
         rowIndex = row;
         colIndex = col;
         tilesToFlip = isValidMove.length;
-        console.log(`${rowIndex} ${colIndex}`);
         while (rowIndex < 7 && colIndex > 0 && tilesToFlip > 0) {
             rowIndex += 1;
             colIndex -= 1;
@@ -341,8 +340,7 @@ function checkIfClickable(row, col) {
     }
 
     // check towards the bottom right
-    // push values into an array to check if last value is equal to player tile
-    const btmRightArr = [];
+    const btmRightArr = []; // push values into an array to check if last value is equal to player tile
     rowIndex = row;
     colIndex = col;
     while (rowIndex < 7 && colIndex < 7) {
@@ -356,11 +354,9 @@ function checkIfClickable(row, col) {
 
     // if valid move, cell is clickable
     if (isValidMove) {
-        clickable = true;
         rowIndex = row;
         colIndex = col;
         tilesToFlip = isValidMove.length;
-        console.log(`${rowIndex} ${colIndex}`);
         while (rowIndex < 7 && colIndex < 7 && tilesToFlip > 0) {
             rowIndex += 1;
             colIndex += 1;
@@ -371,6 +367,7 @@ function checkIfClickable(row, col) {
     }
 
     return affectedTiles;
+    
 
     // check if adjacent tile is not player tile and last tile is player tile within array
     function checkTileValues(arr) {
@@ -387,22 +384,19 @@ function checkIfClickable(row, col) {
                 return false;
             }
         }
-        
     }
 }
 
 // code to flip tiles
 function flipTiles(affectedTiles) {
+    // loop through affected tiles
     for (let i = 0; i < affectedTiles.length; i++) {
         const tileObj = affectedTiles[i];
-        console.log(tileObj);
         const tileVal = gameBoardLayout[tileObj.row][tileObj.col];
         if (currentPlayer === 2 && tileVal === 1) {
-            gameBoardLayout[tileObj.row][tileObj.col] = 2;
-            drawLayout();
+            gameBoardLayout[tileObj.row][tileObj.col] = 2; // change gameBoardLayout values from 1 to 2
         } else if (currentPlayer === 1 && tileVal === 2) {
-            gameBoardLayout[tileObj.row][tileObj.col] = 1;
-            drawLayout();
+            gameBoardLayout[tileObj.row][tileObj.col] = 1; // change gameBoardLayout values from 2 to 1
         }
     }
 }
@@ -434,6 +428,7 @@ function restartGame() {
     // Reset player count
     countPlayerCells();
     drawLayout();
+    checkMoves(currentPlayer);
 }
 
 // Initialize the game
