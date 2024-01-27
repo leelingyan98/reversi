@@ -78,9 +78,10 @@ function handleCellClick(event) {
     const cell = event.target;
     const isCell = cell.classList.contains('cell');
 
-    const cellRow = parseInt(cell.dataset.row); // ensure row value is a number
-    const cellCol = parseInt(cell.dataset.col); // ensure col value is a number
-    console.log(`${cellRow} ${cellCol}`) // check cell row and cell column value
+    const cellRow = parseInt(cell.dataset.row); // set and ensure row value is a number
+    const cellCol = parseInt(cell.dataset.col); // set and ensure col value is a number
+    const cellVal = gameBoardLayout[cellRow][cellCol]; // access current gameboard tile value
+    console.log(`Row ${cellRow} Col ${cellCol} Tile ${cellVal}`) // check current cell row, column and value
 
     // if cell already contains black or white, do not run functions
     if (cell.classList.contains('black') || cell.classList.contains('white')) {
@@ -146,7 +147,9 @@ function checkIfClickable(row, col) {
         const leftArr = [];
         for (let i = col; i > 0 ; i--) {
             const val = gameBoardLayout[row][i];
-            if (val > 0) leftArr.push(val);
+            if (val > 0) {
+                leftArr.push(val);
+            }
         }
 
         const isValidMove = checkTileValues(leftArr);
@@ -154,8 +157,14 @@ function checkIfClickable(row, col) {
         // if valid move, cell is clickable and run flipTiles
         if (isValidMove) {
             clickable = true;
-            for (let i = col; i > 0 ; i--) {
-                flipTiles(row, i);
+            let colIndex = col;
+            const rowIndex = row;
+            let tilesToFlip = isValidMove.length;
+            console.log(`${rowIndex} ${colIndex}`);
+            while (colIndex > 0 && tilesToFlip > 0) {
+                colIndex -= 1;
+                tilesToFlip -= 1;
+                flipTiles(rowIndex, colIndex);
             }
         }
     }
@@ -174,8 +183,14 @@ function checkIfClickable(row, col) {
         // if valid move, cell is clickable and run flipTiles
         if (isValidMove) {
             clickable = true;
-            for (let i = col; i < 7; i++) {
-                flipTiles(row, i);
+            let colIndex = col;
+            const rowIndex = row;
+            let tilesToFlip = isValidMove.length;
+            console.log(`${rowIndex} ${colIndex}`);
+            while (colIndex < 7 && tilesToFlip > 0) {
+                colIndex += 1;
+                tilesToFlip -= 1;
+                flipTiles(rowIndex, colIndex);
             }
         }
     }
@@ -194,8 +209,14 @@ function checkIfClickable(row, col) {
         // if valid move, cell is clickable and run flipTiles
         if (isValidMove) {
             clickable = true;
-            for (let i = row; i > 0; i--) {
-                flipTiles(i, col);
+            const colIndex = col;
+            let rowIndex = row;
+            let tilesToFlip = isValidMove.length;
+            console.log(`${rowIndex} ${colIndex}`);
+            while (rowIndex > 0 && tilesToFlip > 0) {
+                rowIndex -= 1;
+                tilesToFlip -= 1;
+                flipTiles(rowIndex, colIndex);
             }
         }
     }
@@ -214,8 +235,14 @@ function checkIfClickable(row, col) {
         // if valid move, cell is clickable and run flipTiles
         if (isValidMove) {
             clickable = true;
-            for (let i = row; i < 7; i++) {
-                flipTiles(i, col);
+            const colIndex = col;
+            let rowIndex = row;
+            let tilesToFlip = isValidMove.length;
+            console.log(`${rowIndex} ${colIndex}`);
+            while (rowIndex < 7 && tilesToFlip > 0) {
+                rowIndex += 1;
+                tilesToFlip -= 1;
+                flipTiles(rowIndex, colIndex);
             }
         }
     }
@@ -244,10 +271,12 @@ function checkIfClickable(row, col) {
             clickable = true;
             let rowIndex = row;
             let colIndex = col;
+            let tilesToFlip = isValidMove.length;
             console.log(`${rowIndex} ${colIndex}`);
-            while (rowIndex > 0 && colIndex > 0) {
+            while (rowIndex > 0 && colIndex > 0 && tilesToFlip > 0) {
                 rowIndex -= 1;
                 colIndex -= 1;
+                tilesToFlip -= 1;
                 flipTiles(rowIndex, colIndex);
             }
         }
@@ -273,10 +302,12 @@ function checkIfClickable(row, col) {
             clickable = true;
             let rowIndex = row;
             let colIndex = col;
+            let tilesToFlip = isValidMove.length;
             console.log(`${rowIndex} ${colIndex}`);
-            while (rowIndex > 0 && colIndex < 7) {
+            while (rowIndex > 0 && colIndex < 7 && tilesToFlip > 0) {
                 rowIndex -= 1;
                 colIndex += 1;
+                tilesToFlip -= 1;
                 flipTiles(rowIndex, colIndex);
             }
         }
@@ -302,10 +333,12 @@ function checkIfClickable(row, col) {
             clickable = true;
             let rowIndex = row;
             let colIndex = col;
+            let tilesToFlip = isValidMove.length;
             console.log(`${rowIndex} ${colIndex}`);
-            while (rowIndex < 7 && colIndex > 0) {
+            while (rowIndex < 7 && colIndex > 0 && tilesToFlip > 0) {
                 rowIndex += 1;
                 colIndex -= 1;
+                tilesToFlip -= 1;
                 flipTiles(rowIndex, colIndex);
             }
         }
@@ -331,10 +364,12 @@ function checkIfClickable(row, col) {
             clickable = true;
             let rowIndex = row;
             let colIndex = col;
+            let tilesToFlip = isValidMove.length;
             console.log(`${rowIndex} ${colIndex}`);
-            while (rowIndex < 7 && colIndex < 7) {
+            while (rowIndex < 7 && colIndex < 7 && tilesToFlip > 0) {
                 rowIndex += 1;
                 colIndex += 1;
+                tilesToFlip -= 1;
                 flipTiles(rowIndex, colIndex);
             }
         }
@@ -343,11 +378,14 @@ function checkIfClickable(row, col) {
     // check if adjacent tile is not player tile and last tile is player tile within array
     function checkTileValues(arr) {
         const firstVal = arr[0];
-        const lastVal = arr[arr.length - 1];
+        const playerTileLastIndex = arr.indexOf(currentPlayer);
+        const lastVal = arr[playerTileLastIndex];
+        const flippableTiles = arr.slice(0, playerTileLastIndex);
         console.log(arr);
+        console.log(flippableTiles);
         console.log(`first: ${firstVal} Last: ${lastVal}`);
         if (firstVal !== currentPlayer && lastVal === currentPlayer) {
-            return true;
+            return flippableTiles;
         } else {
             return false;
         }
