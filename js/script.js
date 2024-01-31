@@ -11,9 +11,8 @@ let affectedTiles = []; // array of affected tiles
 let blackClickableSpots = 0;
 let whiteClickableSpots = 0;
 let gameOver = false;
-// let turnsPlayed = 0;
 
-// Game Player (to change into Object later?)
+// Game Player
 const blackPlayer = 2; // Assign numerical value "2" to player Black
 let blackPlayerCount = document.getElementById('blackCounter');
 const whitePlayer = 1; // Assign numerical value "1" to player Black
@@ -122,7 +121,6 @@ function drawLayout() {
 
     checkMoves(currentPlayer);
     countPlayerCells();
-    console.log(gameBoardLayout);
 }
 
 // Count how many Black and White in the game board and update UI
@@ -444,9 +442,8 @@ function flipTiles(affectedTiles) {
 
 // Restart the game
 function restartGame() {
-    // Clear the cells
+    // Clear the cells and make them clickable by removing "used" class
     cells.forEach(cell => {
-        // Remove classes "used", "black" and "white"
         cell.classList.remove('used');
     });
 
@@ -466,15 +463,14 @@ function restartGame() {
     currentPlayer = 2;
     statusText.innerText = "Black's Turn";
 
-    // Reset player count
-    countPlayerCells();
-    drawLayout();
+    countPlayerCells(); // Reset player count
+    drawLayout(); // draw game layout
     gameOver = false; // reset gameOver
-    checkMoves(currentPlayer);
+    checkMoves(currentPlayer); // check clickable spots
 }
 
 // Initialize the game
-assignLayoutPos();
+assignLayoutPos(); //
 gameBoard.addEventListener('click', handleCellClick); // run handleCellClick everytime gameBoard is clicked
 restartButton.addEventListener('click', restartGame); // run restartGame when Restart button is clicked
-restartGame(); // use restart game to initalize
+restartGame(); // use restartGame() to initalize
