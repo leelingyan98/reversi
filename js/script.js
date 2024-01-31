@@ -5,10 +5,13 @@ const statusText = document.getElementById('statusText');
 const restartButton = document.getElementById('restartButton');
 
 // Game Logic
+let blackCount = document.querySelectorAll('.cell.black');
+let whiteCount = document.querySelectorAll('.cell.white');
 let affectedTiles = []; // array of affected tiles
+let blackClickableSpots = 0;
+let whiteClickableSpots = 0;
 let gameOver = false;
-let turnsPlayed = 0;
-console.log(`Turn: ${turnsPlayed}`);
+// let turnsPlayed = 0;
 
 // Game Player (to change into Object later?)
 const blackPlayer = 2; // Assign numerical value "2" to player Black
@@ -50,34 +53,41 @@ function checkMoves(player) {
             affectedTiles = []; // reset affectedTiles for next iteration
             let findAffectedTiles = [];
             const cell = document.querySelector(`[data-row="${row}"][data-col="${col}"]`);
-            console.log(`Row ${row} Col ${col}`);
             // get cell and check if "used" class exists. If no, run the check
             if (!cell.classList.contains('used')) {
                 findAffectedTiles = checkIfClickable(row, col);
             }
-            console.log(`Turn: ${currentPlayer} Player: ${player} - Cells affected: ${findAffectedTiles.length}`);
             if (findAffectedTiles.length > 0) {
                 cell.classList.add('clickableSpot');
                 findAffectedTiles = []; // reset findAffectedTiles for next iteration
-            } else if (findAffectedTiles.length < 0) {
-                if(player === 2) {
-                    currentPlayer = 1;
-                    drawLayout();
-                } else if (player === 1) {
-                    currentPlayer = 2;
-                    drawLayout();
-                } else {
-                    gameOver = true;
-                    gameOverScreen();
-                }
             }
         }
     }
+
+    // check if any clickable spots, if not, gameover if no one can move or switch the player turn.
+    const clickableSpots = document.getElementsByClassName('clickableSpot');
+    if (player === 2) {
+        blackClickableSpots = clickableSpots.length;
+    } else if (player === 1) {
+        whiteClickableSpots = clickableSpots.length;
+    }
+
+    if (clickableSpots.length === 0) {
+        if (blackClickableSpots === 0 && whiteClickableSpots === 0) {
+            gameOver = true;
+            gameOverScreen();
+        } else if (player === 2) {
+            currentPlayer = 1;
+            drawLayout();
+        } else if (player === 1) {
+            currentPlayer = 2;
+            drawLayout();
+        }
+    }
+
 }
 
 function gameOverScreen() {
-    countPlayerCells();
-    console.log(`${blackCount} ${whiteCount}`)
     if (blackCount.length === whiteCount.length) {
         statusText.innerText = "It's a tie!";
     } else if (blackCount.length > whiteCount.length) {
@@ -109,14 +119,20 @@ function drawLayout() {
             cell.dataset.value = gameBoardLayout[row][col];
         }
     }
+
+    checkMoves(currentPlayer);
+    countPlayerCells();
     console.log(gameBoardLayout);
 }
 
-// Count how many Black and White in the game board
+// Count how many Black and White in the game board and update UI
 function countPlayerCells() {
-    const blackCount = document.querySelectorAll('.cell.black');
+    blackCount = document.querySelectorAll('.cell.black');
+    const blackPlayerCount = document.getElementById('blackCounter');
     blackPlayerCount.innerText = blackCount.length;
-    const whiteCount = document.querySelectorAll('.cell.white');
+    
+    whiteCount = document.querySelectorAll('.cell.white');
+    const whitePlayerCount = document.getElementById('whiteCounter');
     whitePlayerCount.innerText = whiteCount.length;
 }
 
@@ -136,7 +152,7 @@ function handleCellClick(event) {
         checkIfClickable(cellRow, cellCol);
         if (!cell.classList.contains('clickableSpot')) {
             return;
-        } else if (cell.classList.contains('clickableSpot') && isCell) {
+        } else if (cell.classList.contains('clickableSpot')) {
             if (currentPlayer === 1) {
                 cell.classList.add('white'); // add white tile to cell
                 gameBoardLayout[cellRow][cellCol] = 1; // change gameBoardLayout value to 1
@@ -149,10 +165,6 @@ function handleCellClick(event) {
 
             cell.classList.add('used'); // adding a class to prevent players to change cell values after it is set
 
-            drawLayout();
-
-            countPlayerCells();
-
             // Switch the player
             if (currentPlayer == 1) {
                 currentPlayer = 2;
@@ -162,11 +174,7 @@ function handleCellClick(event) {
                 statusText.innerText = "White's Turn";
             }
 
-            turnsPlayed = turnsPlayed + 1;
-            console.log(`Turn: ${turnsPlayed}`);
-
-            // affectedTiles = []; // reset array of affected tiles
-            checkMoves(currentPlayer);
+            drawLayout();
         }
     }
 }
@@ -192,7 +200,6 @@ function checkIfClickable(row, col) {
     }
 
     let isValidMove = checkTileValues(leftArr);
-    // console.log(`Left tiles to flip: ${isValidMove.length}`);
 
     // if valid move, cell is clickable
     if (isValidMove) {
@@ -218,7 +225,6 @@ function checkIfClickable(row, col) {
     }
 
     isValidMove = checkTileValues(rightArr);
-    // console.log(`Right tiles to flip: ${isValidMove.length}`);
 
     // if valid move, cell is clickable
     if (isValidMove) {
@@ -244,7 +250,6 @@ function checkIfClickable(row, col) {
     }
 
     isValidMove = checkTileValues(topArr);
-    // console.log(`Top tiles to flip: ${isValidMove.length}`);
 
     // if valid move, cell is clickable
     if (isValidMove) {
@@ -270,7 +275,6 @@ function checkIfClickable(row, col) {
     }
 
     isValidMove = checkTileValues(btmArr);
-    // console.log(`Bottom tiles to flip: ${isValidMove.length}`);
 
     // if valid move, cell is clickable
     if (isValidMove) {
@@ -301,7 +305,6 @@ function checkIfClickable(row, col) {
     }
 
     isValidMove = checkTileValues(topLeftArr);
-    // console.log(`Top Left tiles to flip: ${isValidMove.length}`);
 
     // if valid move, cell is clickable
     if (isValidMove) {
@@ -329,7 +332,6 @@ function checkIfClickable(row, col) {
     }
 
     isValidMove = checkTileValues(topRightArr);
-    // console.log(`Top Right tiles to flip: ${isValidMove.length}`);
 
     // if valid move, cell is clickable
     if (isValidMove) {
@@ -357,7 +359,6 @@ function checkIfClickable(row, col) {
     }
 
     isValidMove = checkTileValues(btmLeftArr);
-    // console.log(`Bottom Left tiles to flip: ${isValidMove.length}`);
 
     // if valid move, cell is clickable
     if (isValidMove) {
@@ -385,7 +386,6 @@ function checkIfClickable(row, col) {
     }
 
     isValidMove = checkTileValues(btmRightArr);
-    // console.log(`Bottom Right tiles to flip: ${isValidMove.length}`);
 
     // if valid move, cell is clickable
     if (isValidMove) {
