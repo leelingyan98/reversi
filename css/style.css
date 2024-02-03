@@ -15,7 +15,6 @@ body {
 #tileCounter {
     display: flex;
     align-items: center;
-
 }
 
 .blackTile {
@@ -55,7 +54,7 @@ body {
     cursor: pointer;
 }
 
-.cell.default, .cell.used {
+.cell.used {
     pointer-events: none; /* disable element from being a target */
 }
 
